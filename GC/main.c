@@ -6,27 +6,39 @@
 #include "vm.h"
 
 void markAll(VirtualMemory_t* virtualMemory) {
+
+    UsingMemory_t* usingMemory = virtualMemory->usingMemory;
+
     for (int i = 0; i < virtualMemory->size; i++) {
+
         for (int j = 0; j < virtualMemory->usingMemory->size; j++) {
+
             if (virtualMemory->objects[i] != NULL
-                && virtualMemory->objects[i] == virtualMemory->usingMemory->objects[j]) {
+                && virtualMemory->objects[i] == usingMemory->objects[j]) {
+                
                 virtualMemory->objects[i]->marked = true;
                 break;
             }
+
         }
+
     }
+
 }
 
 void sweep(VirtualMemory_t* virtualMemory) {
+
     for (int i = 0; i < virtualMemory->size; i++) {
+
         if (!virtualMemory->objects[i]->marked) {
             free(virtualMemory->objects[i]);
             virtualMemory->size--;
-        }
-        else {
+        } else {
             virtualMemory->objects[i]->marked = false;
         }
+
     }
+
 }
 
 void gc(VirtualMemory_t* virtualMemory) {

@@ -22,6 +22,7 @@ UsingMemory_t* NewUsingMemory() {
 }
 
 void Push(VirtualMemory_t* virtualMemory, Object_t* object) {
+
     if (virtualMemory == NULL) {
         fprintf(stderr, "NULL pointer to Virtual memory\n");
         exit(EXIT_FAILURE);
@@ -34,27 +35,39 @@ void Push(VirtualMemory_t* virtualMemory, Object_t* object) {
     size_t * size = &virtualMemory->size;
 
     if (*size < SIZE_OF_VIRTUAL_MEMORY) {
+
         virtualMemory->objects[*size] = object;
         (*size)++;
 
-        if (virtualMemory->objects[*size - 1]->next != NULL
-            || virtualMemory->objects[*size - 1]->parent != NULL) {
-            if (virtualMemory->usingMemory == NULL) {
-                virtualMemory->usingMemory = NewUsingMemory();
-                virtualMemory->usingMemory->objects[0] = object;
-                virtualMemory->usingMemory->size++;
-                return;
+        Object_t* nextObject = object->next;
+        Object_t* parentObject = object->parent;
+        
+        UsingMemory_t* usingMemory = virtualMemory->usingMemory;
+
+        if (nextObject != NULL || parentObject != NULL) {
+
+            if (usingMemory != NULL) {
+
+                size_t usingMemmorySize = usingMemory->size;
+
+                if (usingMemmorySize >= virtualMemory->usingMemory->capacity) {
+                    usingMemory->capacity *= 2;
+                    usingMemory->objects = (Object_t *) realloc(usingMemory->objects, usingMemory->capacity);
+                }
+                usingMemory->objects[usingMemmorySize] = object;
+                usingMemory->size++;
+
+            } else {
+
+                usingMemory = NewUsingMemory();
+                usingMemory->objects[0] = object;
+                usingMemory->size++;
+
             }
 
-            if (virtualMemory->usingMemory->size >= virtualMemory->usingMemory->capacity) {
-                virtualMemory->usingMemory->capacity *= 2;
-                virtualMemory->usingMemory->objects = (Object_t*)realloc(virtualMemory->usingMemory->objects, virtualMemory->usingMemory->capacity);
-            }
-            virtualMemory->usingMemory->objects[virtualMemory->usingMemory->size] = object;
-            virtualMemory->usingMemory->size++;
         }
-    }
-    else {
+
+    } else {
         fprintf(stdout, "Stack Overflow !!1 https://ru.stackoverflow.com/");
         exit(EXIT_FAILURE);
     }
@@ -73,8 +86,8 @@ Object_t* Pop(VirtualMemory_t* virtualMemory) {
         virtualMemory->size--;
 
         return object;
-    }
-    else {
+
+    } else {
         fprintf(stdout, "Stack is empty !\n");
         return NULL;
     }
