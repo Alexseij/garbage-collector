@@ -42,26 +42,26 @@ void Push(VirtualMemory_t* virtualMemory, Object_t* object) {
         Object_t* nextObject = object->next;
         Object_t* parentObject = object->parent;
         
-        UsingMemory_t* usingMemory = virtualMemory->usingMemory;
+        UsingMemory_t** usingMemory = &virtualMemory->usingMemory;
 
         if (nextObject != NULL || parentObject != NULL) {
 
-            if (usingMemory != NULL) {
+            if (*usingMemory != NULL) {
 
-                size_t usingMemmorySize = usingMemory->size;
+                size_t usingMemmorySize = (*usingMemory)->size;
 
                 if (usingMemmorySize >= virtualMemory->usingMemory->capacity) {
-                    usingMemory->capacity *= 2;
-                    usingMemory->objects = (Object_t *) realloc(usingMemory->objects, usingMemory->capacity);
+                    (*usingMemory)->capacity *= 2;
+                    (*usingMemory)->objects = (Object_t *) realloc((*usingMemory)->objects, (*usingMemory)->capacity);
                 }
-                usingMemory->objects[usingMemmorySize] = object;
-                usingMemory->size++;
+                (*usingMemory)->objects[usingMemmorySize] = object;
+                (*usingMemory)->size++;
 
             } else {
 
-                usingMemory = NewUsingMemory();
-                usingMemory->objects[0] = object;
-                usingMemory->size++;
+                (*usingMemory) = NewUsingMemory();
+                (*usingMemory)->objects[0] = object;
+                (*usingMemory)->size++;
 
             }
 
