@@ -1,6 +1,6 @@
 # Garbage Collector
 
-# How it's work
+# How it works
 
 - We have Virtual Machine like JVM or something like that , in code this object called Virtual Memory.
 - Virtual Machine can keep objects , in my abstract Virtual Machine they calls Object_t.
